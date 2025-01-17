@@ -40,7 +40,7 @@ export const UserSignup = async(req:Request,res:Response,next:NextFunction) => {
 
 
 
-      return res.status(201).json({ message: "ok", id: user._id.toString() });
+      return res.status(201).json({ message: "ok", name: user.name, email:user.email  });
     } catch (error) {
         console.error("Error fetching users:", error); // Log the error for debugging
         return res.status(500).json({ message: "Failed to fetch users", error: error.message });
@@ -79,7 +79,24 @@ export const UserLogin = async(req:Request,res:Response,next:NextFunction) => {
 
 
 
-      return res.status(200).json({ message: "ok", id: user._id.toString() });
+      return res.status(200).json({ message: "ok", name: user.name, email:user.email });
+    } catch (error) {
+        console.error("Error fetching users:", error); // Log the error for debugging
+        return res.status(500).json({ message: "Failed to fetch users", error: error.message });
+    }
+}
+
+export const verifyUser = async(req:Request,res:Response,next:NextFunction) => {
+    try {
+        const user = await User.findById(res.locals.jwtData.id)
+        if(!user) {
+            return res.status(401).send("User not registered OR Token malfunctioned")
+        }
+        if(user._id.toString() !== res.locals.jwtData.id){
+            return res.status(401).send("Permissions didn't match")
+        }
+
+      return res.status(200).json({ message: "ok", name: user.name, email:user.email });
     } catch (error) {
         console.error("Error fetching users:", error); // Log the error for debugging
         return res.status(500).json({ message: "Failed to fetch users", error: error.message });
