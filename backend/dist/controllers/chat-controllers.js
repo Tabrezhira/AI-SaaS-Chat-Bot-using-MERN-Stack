@@ -3,6 +3,7 @@ import { configureOpenAi } from '../config/openai-config.js';
 import { OpenAIApi } from 'openai';
 export const generateChatCompletion = async (req, res, next) => {
     const { message } = req.body;
+    console.log(req.body);
     try {
         const user = await User.findById(res.locals.jwtData.id);
         if (!user)
@@ -14,7 +15,7 @@ export const generateChatCompletion = async (req, res, next) => {
         //send all chats with new one to openAi Api
         const config = configureOpenAi();
         const openai = new OpenAIApi(config);
-        const chatResponse = await openai.createChatCompletion({ model: 'gpt-3.5-turbo', messages: chats });
+        const chatResponse = await openai.createChatCompletion({ model: 'gpt-4o-mini', messages: chats });
         user.chats.push(chatResponse.data.choices[0].message);
         await user.save();
         return res.status(200).json({ chats: user.chats });
