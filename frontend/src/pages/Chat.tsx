@@ -4,15 +4,17 @@ import { useAuth } from '../context/AuthContext'
 import { red } from '@mui/material/colors'
 import ChatItem from '../components/chat/Chatitem';
 import { IoMdSend } from "react-icons/io";
-import { useRef, useState } from 'react';
-import { sendChatRequest } from '../helpers/api-communicator';
-
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { deleteUserChats, getUserChats, sendChatRequest } from '../helpers/api-communicator';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 type Message={
     role:"user" | "assistant";
     content:string;
 }
 const Chat = () => {
+  const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement | null>(null)
   const auth = useAuth()
   const [chatMessages, setChatsMessages] = useState<Message[]>([])
@@ -27,6 +29,46 @@ const Chat = () => {
     const chatData = await sendChatRequest(content);
     setChatsMessages([...chatData.chats])
   }
+
+  const handleDeleteChats = async () => {
+    try {
+      toast.loading('Deleting Chats', {id: 'deletechats'})
+      await deleteUserChats();
+      setChatsMessages([])
+      toast.success('Deleted Chats Successfully', {id: 'deletechats'})
+    } catch (error) {
+      console.log(error)
+      toast.error("Deleted Chats Failed", { id: 'deletechats' });
+    }
+  }
+
+
+
+
+  useLayoutEffect(() => {
+    if (auth?.isLoggedIn && auth.user) {
+      toast.loading("Loading Chats", { id: 'loadchats' });
+      getUserChats()
+        .then((data) => {
+          setChatsMessages([...data.chats]);
+          toast.success("Successfully loaded chats", { id: 'loadchats' });
+        })
+        .catch((err) => {  // Added parentheses around 'err'
+          console.log(err);
+          toast.error("Loading Failed", { id: 'loadchats' });
+        });
+    }
+  }, [auth]);
+
+  useEffect(() => {
+    if(!auth?.user){
+      return navigate("/login")
+    }
+  
+
+  }, [auth])
+  
+  
   return (
     <Box sx={{display:'flex', flex:1, width:'100%', height:'100%',mt:3, gap:3}}>
       <Box sx={{display:{md:'flex', xs:'none', sm:'none'},width:"30%", flex:0.2, flexDirection:"column"}}>
@@ -41,7 +83,9 @@ const Chat = () => {
             <Typography sx={{mx:'auto', fontFamily:'work sans', my:4, p:3}}>
               You can ask some questions related to knowledge, Business, Advices, Education, etc. But avoid sharing personal information
             </Typography>
-            <Button sx={{width:'200px',
+            <Button 
+            onClick={handleDeleteChats}
+            sx={{width:'200px',
              my:'auto',
               color:'white', 
               fontWeight:'700',
@@ -50,6 +94,7 @@ const Chat = () => {
                bgcolor: red[300],
                ':hover':{
               bgcolor: red.A400
+             
             }}}>
               CLEAR CONVERSATION
             </Button>

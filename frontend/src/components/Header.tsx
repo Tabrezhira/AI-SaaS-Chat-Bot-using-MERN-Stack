@@ -14,7 +14,7 @@ function Header() {
               {auth?.isLoggedIn ? 
               (<>
                <NavigationLink bg='#00fffc' to="/chat" text='Go TO Chat' textColor='black'/>
-                <NavigationLink bg='#51538f' to="/" text='logout' textColor='white' />
+                <NavigationLink bg='#51538f' to="/" onClick={auth.logout} text='logout' textColor='white' />
               </>): (<>
                 <NavigationLink bg='#00fffc' to="/login" text='Login' textColor='black'/>
                 <NavigationLink bg='#51538f' to="/signup" text='Signup' textColor='white' />
