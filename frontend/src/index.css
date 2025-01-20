@@ -33,3 +33,24 @@ html,body{
   border-color: white !important;
 
 }
+
+.rotate {
+  animation: rotation 8s infinite linear;
+  -webkit-animation: rotation 8s infinite linear;
+}
+
+@keyframes rotation {
+  from{
+    transform: totate(0deg);
+    -webkit-transform: totate(0deg);
+    -moz-transform: totate(0deg);
+    -ms-transform: totate(0deg);
+    -o-transform: totate(0deg);
+}to{
+  transform: rotate(359deg);
+  -webkit-transform: rotate(359deg);
+  -moz-transform: rotate(359deg);
+  -ms-transform: rotate(359deg);
+  -o-transform: rotate(359deg);
+}
+}
